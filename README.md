@@ -2,7 +2,7 @@
 
 > **미디언 필터링을 이용한 화음/타악기 소스 분리 (Harmonic/Percussive Source Separation using Median Filtering)**
 
-Derry FitzGerald (2010)의 논문 *"Harmonic/Percussive Separation Using Median Filtering"*에 설명된 알고리즘을 Python으로 구현한 프로젝트입니다. 이 프로젝트는 스펙트로그램에 대한 간단한 이미지 처리 기술을 사용하여 모노 오디오 신호를 **화음(Harmonic)** (피치가 있는 악기) 및 **타악기(Percussive)** (드럼, 과도음) 성분으로 분리합니다.
+Derry FitzGerald (2010)의 논문 "Harmonic/Percussive Separation Using Median Filtering"에 설명된 알고리즘을 Python으로 구현한 프로젝트입니다. 이 프로젝트는 스펙트로그램에 대한 간단한 이미지 처리 기술을 사용하여 모노 오디오 신호를 **화음(Harmonic)** (피치가 있는 악기) 및 **타악기(Percussive)** (드럼, 과도음) 성분으로 분리합니다.
 
 ## 📖 개요 (Overview)
 
