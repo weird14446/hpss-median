@@ -33,6 +33,6 @@ Derry FitzGerald (2010)의 논문 "Harmonic/Percussive Separation Using Median F
 
 이 구현은 다음 논문을 기반으로 합니다:
 
-> **FitzGerald, D. (2010).** ["Harmonic/Percussive Separation Using Median Filtering". *Proc. of the 13th Int. Conference on Digital Audio Effects (DAFx-10), Graz, Austria.*](https://dafx10.iem.at/papers/DerryFitzGerald_DAFx10_P15.pdf)
+> **FitzGerald, D. (2010).** <a href="https://dafx10.iem.at/papers/DerryFitzGerald_DAFx10_P15.pdf" target="_blank">"Harmonic/Percussive Separation Using Median Filtering". *Proc. of the 13th Int. Conference on Digital Audio Effects (DAFx-10), Graz, Austria.*</a>
 
 ---
