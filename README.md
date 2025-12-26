@@ -1,38 +1,39 @@
 # hpss-median
 
-> **Harmonic/Percussive Source Separation using Median Filtering**
+> **미디언 필터링을 이용한 화음/타악기 소스 분리 (Harmonic/Percussive Source Separation using Median Filtering)**
 
-A Python implementation of the algorithm described in the paper *"Harmonic/Percussive Separation Using Median Filtering"* by Derry FitzGerald (2010). This project separates a monophonic audio signal into **Harmonic** (pitched instruments) and **Percussive** (drums, transients) components using simple image processing techniques on spectrograms.
+Derry FitzGerald (2010)의 논문 *"Harmonic/Percussive Separation Using Median Filtering"*에 설명된 알고리즘을 Python으로 구현한 프로젝트입니다. 이 프로젝트는 스펙트로그램에 대한 간단한 이미지 처리 기술을 사용하여 모노 오디오 신호를 **화음(Harmonic)** (피치가 있는 악기) 및 **타악기(Percussive)** (드럼, 과도음) 성분으로 분리합니다.
 
-## 📖 Overview
+## 📖 개요 (Overview)
 
-In an audio spectrogram:
-- [cite_start]**Harmonic sounds** (e.g., piano, violin) appear as **horizontal lines** (stable frequency over time). [cite: 20, 21]
-- [cite_start]**Percussive sounds** (e.g., drums) appear as **vertical lines** (broadband energy in short time). [cite: 20, 23]
+오디오 스펙트로그램에서:
+- **화음 사운드** (예: 피아노, 바이올린)는 **가로줄** (시간이 지나도 안정적인 주파수)로 나타납니다.
+- **타악기 사운드** (예: 드럼)는 **세로줄** (짧은 시간 동안의 광대역 에너지)로 나타납니다.
 
-This project utilizes **Median Filters** to exploit these geometric characteristics:
-1.  [cite_start]**Horizontal Median Filter:** Suppresses vertical lines (percussive) to extract harmonics. [cite: 7]
-2.  [cite_start]**Vertical Median Filter:** Suppresses horizontal lines (harmonic) to extract percussive elements. [cite: 7]
-3.  [cite_start]**Soft Masking:** Combines the filtered results to generate high-quality separated audio. [cite: 154]
+이 프로젝트는 이러한 기하학적 특성을 활용하기 위해 **미디언 필터(Median Filters)**를 사용합니다:
+1.  **가로 미디언 필터 (Horizontal Median Filter):** 세로줄(타악기)을 억제하여 화음을 추출합니다.
+2.  **세로 미디언 필터 (Vertical Median Filter):** 가로줄(화음)을 억제하여 타악기 요소를 추출합니다.
+3.  **소프트 마스킹 (Soft Masking):** 필터링된 결과를 결합하여 고품질의 분리된 오디오를 생성합니다.
 
-## 🚀 Features
+## 🚀 주요 기능 (Features)
 
-- [cite_start]**No Deep Learning Required:** Pure algorithmic approach using STFT and median filtering. [cite: 16]
-- [cite_start]**Fast & Lightweight:** Much faster than iterative optimization methods. [cite: 6]
-- **Visualizations:** Includes scripts to visualize the original, harmonic, and percussive spectrograms.
+- **딥러닝 불필요:** STFT와 미디언 필터링만을 사용하는 순수 알고리즘 접근 방식입니다.
+- **빠르고 가벼움:** 반복적인 최적화 방법보다 훨씬 빠릅니다.
+- **시각화 (Visualizations):** 원본, 화음, 타악기 스펙트로그램을 시각화하는 기능을 포함합니다.
 
-## 🛠️ Tech Stack
+## 🛠️ 기술 스택 (Tech Stack)
 
 - **Python 3.x**
-- **Librosa:** For audio loading and STFT/iSTFT operations.
-- **NumPy:** For matrix operations and masking logic.
-- **SciPy:** For `ndimage.median_filter`.
+- **Librosa:** 오디오 로딩 및 STFT/iSTFT 연산용.
+- **NumPy:** 행렬 연산 및 마스킹 로직용.
+- **SciPy:** `ndimage.median_filter` 사용.
+- **Matplotlib:** 스펙트로그램 시각화용.
 
-## 📄 Reference
+## 📄 참고 문헌 (Reference)
 
-This implementation is based on the following paper:
+이 구현은 다음 논문을 기반으로 합니다:
 
-> **FitzGerald, D. (2010).** "Harmonic/Percussive Separation Using Median Filtering". *Proc. of the 13th Int. [cite_start]Conference on Digital Audio Effects (DAFx-10), Graz, Austria.* [cite: 1]
+> **FitzGerald, D. (2010).** "Harmonic/Percussive Separation Using Median Filtering". *Proc. of the 13th Int. Conference on Digital Audio Effects (DAFx-10), Graz, Austria.*
 
 ---
-*Developed by [Your Name] as a study project on Audio Signal Processing.*
+*오디오 신호 처리 연구 프로젝트로 [이름]에 의해 개발되었습니다.*

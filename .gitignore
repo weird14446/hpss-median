@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Mac OS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Audio Files (Inputs & Outputs)
+*.wav
+*.mp3
+*.flac
+*.m4a
+
+# Specific Output Files (Recdundant if * is used above, but good for clarity)
+# *_harmonic.wav
+# *_percussive.wav

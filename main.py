@@ -6,17 +6,31 @@ import numpy as np
 import librosa
 import soundfile as sf
 from scipy.ndimage import median_filter
+import matplotlib.pyplot as plt
+import librosa.display
+import pygame
 
 class HPSSApp:
     def __init__(self, root):
         self.root = root
         self.root.title("HPSS - Median Filter Separator")
-        self.root.geometry("500x350")
+        self.root.geometry("500x450")
         self.root.resizable(False, False)
+
+        # Pygame Mixer 초기화
+        pygame.mixer.init()
 
         # 상태 변수
         self.file_path = None
         self.is_processing = False
+        
+        # 시각화용 데이터 저장
+        self.spec_data = {
+            "sr": None,
+            "S_full_mag": None,
+            "H_mag": None,
+            "P_mag": None
+        }
 
         # UI 구성
         self._setup_ui()
@@ -34,12 +48,35 @@ class HPSSApp:
         btn_frame.pack(pady=10)
 
         self.select_btn = tk.Button(btn_frame, text="📂 오디오 파일 선택", command=self.select_file, width=20, height=2)
-        self.select_btn.pack()
+        self.select_btn.pack(side=tk.LEFT, padx=5)
+
+        self.viz_btn = tk.Button(btn_frame, text="📊 스펙트로그램 보기", command=self.show_visualizations, 
+                                 width=20, height=2, state="disabled")
+        self.viz_btn.pack(side=tk.LEFT, padx=5)
 
         # 실행 버튼
         self.process_btn = tk.Button(self.root, text="🚀 분리 시작 (Start HPSS)", command=self.start_processing, 
                                      width=20, height=2, bg="#007bff", fg="white", state="disabled")
-        self.process_btn.pack(pady=20)
+        self.process_btn.pack(pady=10)
+
+        # 재생 컨트롤 영역
+        play_frame = tk.LabelFrame(self.root, text="Audio Playback", padx=10, pady=10)
+        play_frame.pack(pady=10, fill="x", padx=20)
+
+        self.btn_play_orig = tk.Button(play_frame, text="▶️ Original", state="disabled", 
+                                       command=lambda: self.play_audio("original"))
+        self.btn_play_orig.pack(side=tk.LEFT, expand=True, fill="x", padx=2)
+
+        self.btn_play_harm = tk.Button(play_frame, text="▶️ Harmonic", state="disabled", 
+                                       command=lambda: self.play_audio("harmonic"))
+        self.btn_play_harm.pack(side=tk.LEFT, expand=True, fill="x", padx=2)
+
+        self.btn_play_perc = tk.Button(play_frame, text="▶️ Percussive", state="disabled", 
+                                       command=lambda: self.play_audio("percussive"))
+        self.btn_play_perc.pack(side=tk.LEFT, expand=True, fill="x", padx=2)
+
+        self.btn_stop = tk.Button(play_frame, text="⏹️ Stop", command=self.stop_audio, bg="#ffcccc")
+        self.btn_stop.pack(side=tk.LEFT, padx=5)
 
         # 상태 메시지
         self.status_label = tk.Label(self.root, text="파일을 선택해주세요.", fg="blue")
@@ -54,6 +91,10 @@ class HPSSApp:
             self.file_label.config(text=os.path.basename(filename), fg="black")
             self.process_btn.config(state="normal", bg="#007bff")
             self.status_label.config(text="준비 완료. '분리 시작'을 누르세요.")
+            self.btn_play_orig.config(state="normal")
+            # 새 파일 로드 시 이전 결과 재생 버튼 비활성화
+            self.btn_play_harm.config(state="disabled")
+            self.btn_play_perc.config(state="disabled")
 
     def start_processing(self):
         if not self.file_path:
@@ -108,6 +149,12 @@ class HPSSApp:
             y_harmonic = librosa.istft(H_sep * S_phase, hop_length=1024)
             y_percussive = librosa.istft(P_sep * S_phase, hop_length=1024)
 
+            # 시각화를 위해 데시벨 스케일로 변환하여 저장
+            self.spec_data["sr"] = sr
+            self.spec_data["S_full_mag"] = librosa.amplitude_to_db(S_mag, ref=np.max)
+            self.spec_data["H_mag"] = librosa.amplitude_to_db(H_sep, ref=np.max)
+            self.spec_data["P_mag"] = librosa.amplitude_to_db(P_sep, ref=np.max)
+
             # === [결과 저장] ===
             base_name = os.path.splitext(self.file_path)[0]
             sf.write(f"{base_name}_harmonic.wav", y_harmonic, sr)
@@ -122,13 +169,73 @@ class HPSSApp:
         self.is_processing = False
         self.process_btn.config(state="normal", text="🚀 분리 시작 (Start HPSS)")
         self.select_btn.config(state="normal")
-
+        
         if success:
+            self.viz_btn.config(state="normal")
+            self.btn_play_harm.config(state="normal")
+            self.btn_play_perc.config(state="normal")
             self.status_label.config(text="완료! 원본 파일 위치에 저장되었습니다.")
             messagebox.showinfo("성공", f"분리가 완료되었습니다!\n\n저장 위치:\n{message}_harmonic.wav\n{message}_percussive.wav")
         else:
             self.status_label.config(text="오류 발생")
             messagebox.showerror("에러", f"처리 중 문제가 발생했습니다:\n{message}")
+
+    def play_audio(self, type_):
+        if not self.file_path:
+            return
+            
+        try:
+            target_path = ""
+            base_name = os.path.splitext(self.file_path)[0]
+            
+            if type_ == "original":
+                target_path = self.file_path
+            elif type_ == "harmonic":
+                target_path = f"{base_name}_harmonic.wav"
+            elif type_ == "percussive":
+                target_path = f"{base_name}_percussive.wav"
+            
+            if not os.path.exists(target_path):
+                messagebox.showwarning("파일 없음", f"파일을 찾을 수 없습니다:\n{target_path}")
+                return
+
+            pygame.mixer.music.load(target_path)
+            pygame.mixer.music.play()
+            self.status_label.config(text=f"재생 중: {type_}...")
+            
+        except Exception as e:
+            messagebox.showerror("재생 오류", str(e))
+
+    def stop_audio(self):
+        pygame.mixer.music.stop()
+        self.status_label.config(text="재생 정지됨.")
+
+    def show_visualizations(self):
+        if self.spec_data["S_full_mag"] is None:
+            return
+
+        plt.figure(figsize=(12, 8))
+
+        # 1. 원본
+        plt.subplot(3, 1, 1)
+        librosa.display.specshow(self.spec_data["S_full_mag"], sr=self.spec_data["sr"], hop_length=1024, x_axis='time', y_axis='log')
+        plt.colorbar(format='%+2.0f dB')
+        plt.title('Original Spectrogram')
+
+        # 2. Harmonic
+        plt.subplot(3, 1, 2)
+        librosa.display.specshow(self.spec_data["H_mag"], sr=self.spec_data["sr"], hop_length=1024, x_axis='time', y_axis='log')
+        plt.colorbar(format='%+2.0f dB')
+        plt.title('Harmonic Component (Horizontal Filter)')
+
+        # 3. Percussive
+        plt.subplot(3, 1, 3)
+        librosa.display.specshow(self.spec_data["P_mag"], sr=self.spec_data["sr"], hop_length=1024, x_axis='time', y_axis='log')
+        plt.colorbar(format='%+2.0f dB')
+        plt.title('Percussive Component (Vertical Filter)')
+
+        plt.tight_layout()
+        plt.show()
 
 if __name__ == "__main__":
     root = tk.Tk()
